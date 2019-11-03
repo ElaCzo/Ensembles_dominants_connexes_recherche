@@ -34,7 +34,6 @@ public class DefaultTeam {
   }
 
   public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
-    //REMOVE >>>>>
     ArrayList<Point> mis = MIS(points, edgeThreshold);
     ArrayList<Colored_Point> colored_points = Utils.toColoredPoint(points);
     Utils.mark(colored_points, (ArrayList)colored_points, Colour.GREY);
@@ -46,6 +45,7 @@ public class DefaultTeam {
         grey.setColor(Colour.BLUE);
       }
     }
+
     /*for i ¼ 5; 4; 3; 2 do
       while there exists a grey node
     adjacent to at least i black
