@@ -12,10 +12,27 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class DefaultTeam {
+
+  // sequential algorithm
+  private ArrayList<Point> MIS(ArrayList<Point> points, int edgeThreshold){
+    ArrayList<Point> I = new ArrayList<>();
+    ArrayList<Point> V = (ArrayList)points.clone();
+
+    while(!V.isEmpty()){
+      Point v = V.remove(V.size()-1);
+      I.add(v);
+      for(int i=V.size()-1; i>=0; i--){
+        Point n = V.get(i);
+        if(n.distance(v)<edgeThreshold)
+          V.remove(n);
+      }
+    }
+    return I;
+  }
+
   public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
     //REMOVE >>>>>
-    ArrayList<Point> result = (ArrayList<Point>)points.clone();
-    for (int i=0;i<points.size()/3;i++) result.remove(0);
+    ArrayList<Point> result = MIS(points, edgeThreshold);
     // if (false) result = readFromFile("output0.points");
     // else saveToFile("output",result);
     //<<<<< REMOVE
