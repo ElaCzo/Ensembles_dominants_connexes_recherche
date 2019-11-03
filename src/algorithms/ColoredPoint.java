@@ -2,10 +2,10 @@ package algorithms;
 
 import java.awt.*;
 
-public class Colored_Point extends Point {
+public class ColoredPoint extends Point {
     private Colour color;
 
-    public Colored_Point(Point p){
+    public ColoredPoint(Point p){
         super(p);
         color = Colour.BLACK;
     }

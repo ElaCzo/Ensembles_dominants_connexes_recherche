@@ -7,46 +7,46 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Utils {
-    protected static ArrayList<Colored_Point> toColoredPoint(ArrayList<Point> p){
-        return (ArrayList<Colored_Point>) p.stream().map(Colored_Point::new)
+    protected static ArrayList<ColoredPoint> toColoredPoint(ArrayList<Point> p){
+        return (ArrayList<ColoredPoint>) p.stream().map(ColoredPoint::new)
                 .collect(Collectors.toList());
     }
 
-    protected static void mark(ArrayList<Colored_Point> points, ArrayList<Point> toMark, Colour c){
+    protected static void mark(ArrayList<ColoredPoint> points, ArrayList<Point> toMark, Colour c){
         points.stream().filter(e-> toMark.contains(e)).forEach(e->{e.setColor(c);});
     }
 
-    protected static Colored_Point greyNode(ArrayList<Colored_Point> points){
+    protected static ColoredPoint greyNode(ArrayList<ColoredPoint> points){
         Stream stream = points.stream().filter(e -> e.getColor()==Colour.BLACK);
-        return (Colored_Point) stream.findFirst().get();
+        return (ColoredPoint) stream.findFirst().get();
     }
 
-    protected static ArrayList<Colored_Point> neighbors
-            (ArrayList<Colored_Point> points, Colored_Point p, int edgeThreshold){
-        return (ArrayList<Colored_Point>)points.stream()
+    protected static ArrayList<ColoredPoint> neighbors
+            (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
+        return (ArrayList<ColoredPoint>)points.stream()
                 .filter(e -> !e.equals(p) && e.distance(p)<edgeThreshold)
                 .collect(Collectors.toList());
     }
 
-    protected static ArrayList<Colored_Point> neighbors
-            (ArrayList<Colored_Point> points, Colored_Point p, Colour c, int edgeThreshold){
-        return (ArrayList<Colored_Point>) neighbors(points, p, edgeThreshold).stream().filter(e->e.getColor()==c).collect(Collectors.toList());
+    protected static ArrayList<ColoredPoint> neighbors
+            (ArrayList<ColoredPoint> points, ColoredPoint p, Colour c, int edgeThreshold){
+        return (ArrayList<ColoredPoint>) neighbors(points, p, edgeThreshold).stream().filter(e->e.getColor()==c).collect(Collectors.toList());
     }
 
-    private static ArrayList<Colored_Point> cloud
-            (ArrayList<Colored_Point> points, Colored_Point p, HashSet<Colored_Point> result, Colour c,
+    private static ArrayList<ColoredPoint> cloud
+            (ArrayList<ColoredPoint> points, ColoredPoint p, HashSet<ColoredPoint> result, Colour c,
              int edgeThreshold){
-        return (ArrayList<Colored_Point>) points.stream()
+        return (ArrayList<ColoredPoint>) points.stream()
                 .filter(e->!result.contains(e) && e.getColor()==c && p.distance(e)<edgeThreshold)
                 .collect(Collectors.toList());
     }
 
     /* points de la même couleur c pour lesquels il existe
     un chemin dans cet ensemble qui mène au point en paramètre. */
-    protected static ArrayList<Colored_Point> cloud
-    (ArrayList<Colored_Point> points, Point p, Colour c, int edgeThreshold){
-        HashSet<Colored_Point> result = new HashSet<>();
-        HashSet<Colored_Point> tmp = new HashSet<>();;
+    protected static ArrayList<ColoredPoint> cloud
+    (ArrayList<ColoredPoint> points, ColoredPoint p, Colour c, int edgeThreshold){
+        HashSet<ColoredPoint> result = new HashSet<>();
+        HashSet<ColoredPoint> tmp = new HashSet<>();;
 
         tmp.addAll(neighbors(points, p, Colour.BLUE, edgeThreshold));
         do {
@@ -59,26 +59,30 @@ public class Utils {
         }while(!tmp.equals(result));
 
 
-        ArrayList<Colored_Point> r = new ArrayList();
+        ArrayList<ColoredPoint> r = new ArrayList();
         r.addAll(result);
         return r;
     }
 
-    protected static ArrayList<Colored_Point> blackBlueComponent
-            (ArrayList<Colored_Point> points, Colored_Point p, int edgeThreshold){
-        ArrayList<Colored_Point> blackNeighbors = neighbors(points, p, Colour.BLACK, edgeThreshold);
-        ArrayList<Colored_Point> blueCloud = cloud(points, p, Colour.BLUE, edgeThreshold);
+    protected static BlackBlueComponent blackBlueComponent
+            (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
+        ArrayList<ColoredPoint> blackNeighbors = neighbors(points, p, Colour.BLACK, edgeThreshold);
+        ArrayList<ColoredPoint> blueCloud = new ArrayList<>(); blueCloud.add(p);
 
-        HashSet<Colored_Point> blackBlueComponent = new ArrayList<>();
-        blackBlueComponent.addAll(blackNeighbors);
-        blackBlueComponent.addAll(blueCloud);
+        BlackBlueComponent blackBlueComponent = new BlackBlueComponent();
+        blackBlueComponent.blackBlueComponent.addAll(blackNeighbors);
+        blackBlueComponent.blackBlueComponent.addAll(blueCloud);
 
-        blackBlueComponent.addAll(blueCloud.stream()
-                .map(e->neighbors(points, p, Colour.BLACK, edgeThreshold)).flatMap(e->e.stream())
+        blackBlueComponent.blackBlueComponent.addAll(blueCloud.stream()
+                .map(e->neighbors(points, p, Colour.BLACK, edgeThreshold))
+                .flatMap(e->e.stream())
                 .collect(Collectors.toList()));
 
-        ArrayList<Colored_Point> result = new ArrayList<>();
-        result.addAll(blackBlueComponent);
-        return result;
+        return blackBlueComponent;
+    }
+
+    protected static boolean equalsBlackBlueComponent
+            (ArrayList<ColoredPoint> bbc1, ArrayList<ColoredPoint> bbc2){
+        return bbc1.stream().filter(e->e.getColor()==Colour.BLUE).anyMatch(bbc2::contains);
     }
 }

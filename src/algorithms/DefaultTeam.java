@@ -10,9 +10,9 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DefaultTeam {
 
@@ -35,29 +35,43 @@ public class DefaultTeam {
 
   public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
     ArrayList<Point> mis = MIS(points, edgeThreshold);
-    ArrayList<Colored_Point> colored_points = Utils.toColoredPoint(points);
+    ArrayList<ColoredPoint> colored_points = Utils.toColoredPoint(points);
     Utils.mark(colored_points, (ArrayList)colored_points, Colour.GREY);
     Utils.mark(colored_points, mis, Colour.BLACK);
 
-    Colored_Point grey;
+    ColoredPoint grey;
     for(int i=5; i>1; i--){
+      ArrayList<ColoredPoint> neighbors = new ArrayList<>();
       while((grey=Utils.greyNode(colored_points))!=null){
         grey.setColor(Colour.BLUE);
+
+        // on compte le nombre de voisins noirs :
+        long numberBlackNeighbors = Utils.neighbors(colored_points, grey, Colour.BLACK, edgeThreshold).size();
+
+        // on compte le nombre de blackBlueComponent différents
+        HashSet<BlackBlueComponent> blackBlueComponents = new HashSet<>();
+        blackBlueComponents
+                .addAll(new HashSet<ColoredPoint>(Utils.neighbors(colored_points, grey, Colour.BLUE, edgeThreshold))
+                .stream()
+                .map(e->Utils.blackBlueComponent(colored_points, e, edgeThreshold))
+                .collect(Collectors.toSet()));
+
+        long nombreBlackNodes = blackBlueComponents
+                  .stream()
+                  .filter(e->e.blackNodes().size()>0)
+                  .map(e->e.blackNodes())
+                  .flatMap(e->e.stream())
+                  .distinct()
+                  .count();
+
+        // à vérifier
+        if(nombreBlackNodes>=i && blackBlueComponents.size()>=i){
+          grey.setColor(Colour.BLUE);
+        }
       }
     }
 
-    /*for i ¼ 5; 4; 3; 2 do
-      while there exists a grey node
-    adjacent to at least i black
-    nodes in different black-blue
-    components
-    do change its color from grey to
-    blue;
-    return all blue nodes.*/
-
-    // WIP
-
-    return (ArrayList)colored_points;
+    return (ArrayList<Point>) colored_points.stream().filter(e->e.getColor()==Colour.BLUE);
   }
   
   //FILE PRINTER
