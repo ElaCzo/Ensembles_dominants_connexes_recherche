@@ -1,6 +1,6 @@
 package algorithms;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 
 import java.io.FileNotFoundException;
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DefaultTeam {
 
@@ -32,20 +33,27 @@ public class DefaultTeam {
     return I;
   }
 
-  private ArrayList<Colored_Point> toColoredPoint(ArrayList<Point> p){
-    return (ArrayList<Colored_Point>) p.stream().map(Colored_Point::new).collect(Collectors.toList());
-  }
-
-  private void mark(ArrayList<Colored_Point> points, ArrayList<Point> toMark, Colour c){
-    points.stream().filter(e-> toMark.contains(e)).forEach(e->{e.setColor(c);});
-  }
-
   public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
     //REMOVE >>>>>
     ArrayList<Point> mis = MIS(points, edgeThreshold);
-    ArrayList<Colored_Point> colored_points = toColoredPoint(points);
-    mark(colored_points, (ArrayList)colored_points, Colour.GREY);
-    mark(colored_points, mis, Colour.BLACK);
+    ArrayList<Colored_Point> colored_points = Utils.toColoredPoint(points);
+    Utils.mark(colored_points, (ArrayList)colored_points, Colour.GREY);
+    Utils.mark(colored_points, mis, Colour.BLACK);
+
+    Colored_Point grey;
+    for(int i=5; i>1; i--){
+      while((grey=Utils.greyNode(colored_points))!=null){
+        grey.setColor(Colour.BLUE);
+      }
+    }
+    /*for i ¼ 5; 4; 3; 2 do
+      while there exists a grey node
+    adjacent to at least i black
+    nodes in different black-blue
+    components
+    do change its color from grey to
+    blue;
+    return all blue nodes.*/
 
     // WIP
 
