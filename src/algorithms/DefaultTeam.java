@@ -71,7 +71,14 @@ public class DefaultTeam {
       }
     }
 
-    return (ArrayList<Point>) colored_points.stream().filter(e->e.getColor()==Colour.BLUE);
+    ArrayList<Point> result = new ArrayList<>();
+    result.addAll(colored_points
+            .stream()
+            .filter(e->e.getColor()==Colour.BLUE)
+            .collect(Collectors.toList()));
+
+    System.out.println(result);
+    return result;
   }
   
   //FILE PRINTER

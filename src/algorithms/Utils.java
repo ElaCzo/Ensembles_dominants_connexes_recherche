@@ -17,8 +17,14 @@ public class Utils {
     }
 
     protected static ColoredPoint greyNode(ArrayList<ColoredPoint> points){
-        Stream stream = points.stream().filter(e -> e.getColor()==Colour.BLACK);
-        return (ColoredPoint) stream.findFirst().get();
+        ArrayList<ColoredPoint> result = (ArrayList<ColoredPoint>) points
+                .stream()
+                .filter(e -> e.getColor()==Colour.BLACK)
+                .collect(Collectors.toList());
+        if(result.size()==0)
+            return null;
+        else
+            return result.get(0);
     }
 
     protected static ArrayList<ColoredPoint> neighbors

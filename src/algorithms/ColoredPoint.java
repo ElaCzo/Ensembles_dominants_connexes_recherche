@@ -24,4 +24,9 @@ public class ColoredPoint extends Point {
         return super.equals((Point)o);
         return false;
     }
+
+    @Override
+    public String toString(){
+        return super.toString()+" "+color.name();
+    }
 }
