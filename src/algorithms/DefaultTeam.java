@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DefaultTeam {
 
@@ -30,16 +32,19 @@ public class DefaultTeam {
     return I;
   }
 
+  private ArrayList<Colored_Point> toColoredPoint(ArrayList<Point> p){
+    return (ArrayList<Colored_Point>) p.stream().map(Colored_Point::new).collect(Collectors.toList());
+  }
+  private ArrayList<Colored_Point> mark(ArrayList<Colored_Point> p, Colour c){
+    return p.stream().map(e -> {e.setColor(c); return e}).collect(Collectors.toList());
+  }
+
   public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
     //REMOVE >>>>>
     ArrayList<Point> result = MIS(points, edgeThreshold);
-    // if (false) result = readFromFile("output0.points");
-    // else saveToFile("output",result);
-    //<<<<< REMOVE
 
     return result;
   }
-  
   
   //FILE PRINTER
   private void saveToFile(String filename,ArrayList<Point> result){
