@@ -35,15 +35,21 @@ public class DefaultTeam {
   private ArrayList<Colored_Point> toColoredPoint(ArrayList<Point> p){
     return (ArrayList<Colored_Point>) p.stream().map(Colored_Point::new).collect(Collectors.toList());
   }
-  private ArrayList<Colored_Point> mark(ArrayList<Colored_Point> p, Colour c){
-    return p.stream().map(e -> {e.setColor(c); return e}).collect(Collectors.toList());
+
+  private void mark(ArrayList<Colored_Point> points, ArrayList<Point> toMark, Colour c){
+    points.stream().filter(e-> toMark.contains(e)).forEach(e->{e.setColor(c);});
   }
 
   public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
     //REMOVE >>>>>
-    ArrayList<Point> result = MIS(points, edgeThreshold);
+    ArrayList<Point> mis = MIS(points, edgeThreshold);
+    ArrayList<Colored_Point> colored_points = toColoredPoint(points);
+    mark(colored_points, (ArrayList)colored_points, Colour.GREY);
+    mark(colored_points, mis, Colour.BLACK);
 
-    return result;
+    // WIP
+
+    return (ArrayList)colored_points;
   }
   
   //FILE PRINTER

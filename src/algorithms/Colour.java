@@ -1,5 +1,5 @@
 package algorithms;
 
-public enum Color_Point {
+public enum Colour {
     BLACK, GREY, WHITE;
 }
