@@ -1,5 +1,6 @@
 package algorithms;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
@@ -22,5 +23,4 @@ public class BlackBlueComponent {
                 .filter(e->e.getColor()==Colour.BLACK)
                 .collect(Collectors.toSet());
     }
-
 }

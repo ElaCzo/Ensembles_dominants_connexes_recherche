@@ -54,12 +54,12 @@ public class Utils {
         HashSet<ColoredPoint> result = new HashSet<>();
         HashSet<ColoredPoint> tmp = new HashSet<>();;
 
-        tmp.addAll(neighbors(points, p, Colour.BLUE, edgeThreshold));
+        tmp.addAll(neighbors(points, p, c, edgeThreshold));
         do {
             result.addAll(tmp);
             tmp.addAll(points
                     .stream()
-                    .map(e->cloud(points, e, result, Colour.BLUE, edgeThreshold))
+                    .map(e->cloud(points, e, result, c, edgeThreshold))
                     .flatMap(e->e.stream())
                     .collect(Collectors.toSet()));
         }while(!tmp.equals(result));
@@ -72,23 +72,24 @@ public class Utils {
 
     protected static BlackBlueComponent blackBlueComponent
             (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
-        ArrayList<ColoredPoint> blackNeighbors = neighbors(points, p, Colour.BLACK, edgeThreshold);
-        ArrayList<ColoredPoint> blueCloud = new ArrayList<>(); blueCloud.add(p);
+        ArrayList<ColoredPoint> blueNeighbors = neighbors(points, p, Colour.BLUE, edgeThreshold);
+        HashSet<ColoredPoint> blackCloud = new HashSet<>(); blackCloud.add(p);
+        blackCloud.addAll(cloud(points, p, Colour.BLACK, edgeThreshold));
 
         BlackBlueComponent blackBlueComponent = new BlackBlueComponent();
-        blackBlueComponent.blackBlueComponent.addAll(blackNeighbors);
-        blackBlueComponent.blackBlueComponent.addAll(blueCloud);
+        blackBlueComponent.blackBlueComponent.addAll(blueNeighbors);
+        blackBlueComponent.blackBlueComponent.addAll(blackCloud);
 
-        blackBlueComponent.blackBlueComponent.addAll(blueCloud.stream()
-                .map(e->neighbors(points, p, Colour.BLACK, edgeThreshold))
+        blackBlueComponent.blackBlueComponent.addAll(blackCloud.stream()
+                .map(e->neighbors(points, p, Colour.BLUE, edgeThreshold))
                 .flatMap(e->e.stream())
                 .collect(Collectors.toList()));
 
         return blackBlueComponent;
     }
 
-    protected static boolean equalsBlackBlueComponent
+    /*protected static boolean equalsBlackBlueComponent
             (ArrayList<ColoredPoint> bbc1, ArrayList<ColoredPoint> bbc2){
         return bbc1.stream().filter(e->e.getColor()==Colour.BLUE).anyMatch(bbc2::contains);
-    }
+    }*/
 }
