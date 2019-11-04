@@ -1,7 +1,7 @@
 package algorithms;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -10,14 +10,11 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class DefaultTeam {
 
-    // ajouter les points seuls aussi.
+    // Algorithme MIS qui garantit 2 hops :
   public static ArrayList<Point> MIS2
           (ArrayList<Point> points, int edgeThreshold) {
     ArrayList<ColoredPoint> uncoloredNodes = Utils.toColoredPoint(points);
@@ -108,11 +105,26 @@ public class DefaultTeam {
                 .collect(Collectors.toSet());
 
         cpt++;
-        if(blackBlueComponents.size()>=i){
-          System.out.println(blackBlueComponents.size());
-          grey.setColor(Colour.BLUE);
-          greyNodes.remove(grey);
-          cpt=0;
+        if(blackBlueComponents.size()>=i) {
+            System.out.println(blackBlueComponents.size());
+            grey.setColor(Colour.BLUE);
+
+            BlackBlueComponent bres = new BlackBlueComponent();
+
+            blackBlueComponents.stream().forEach(e->bres.blackBlueComponent.addAll(e.blackBlueComponent));
+            bres.blackBlueComponent.add(grey);
+
+            // on met à jour la liste :
+            BlackBlueComponent
+                    .liste
+                    .keySet()
+                    .stream()
+                    .filter(e->bres.blackBlueComponent
+                    .contains(e))
+                    .forEach(e->BlackBlueComponent.liste.put(e, bres));
+
+            greyNodes.remove(grey);
+            cpt=0;
         }
       }
     }
