@@ -40,33 +40,31 @@ public class DefaultTeam {
     Utils.mark(colored_points, mis, Colour.BLACK);
 
     ColoredPoint grey;
+    ArrayList<ColoredPoint> greyNodes;
     for(int i=5; i>1; i--){
       ArrayList<ColoredPoint> neighbors = new ArrayList<>();
-      while((grey=Utils.greyNode(colored_points))!=null){
-        grey.setColor(Colour.BLUE);
 
-        // on compte le nombre de voisins noirs :
-        long numberBlackNeighbors = Utils.neighbors(colored_points, grey, Colour.BLACK, edgeThreshold).size();
+      greyNodes=Utils.greyNodes(colored_points);
+      int cpt=0;
+      while(!greyNodes.isEmpty() && cpt<greyNodes.size()){
+        grey=greyNodes.get(cpt);
 
-        // on compte le nombre de blackBlueComponent différents
         HashSet<BlackBlueComponent> blackBlueComponents = new HashSet<>();
-        blackBlueComponents
-                .addAll(new HashSet<ColoredPoint>(Utils.neighbors(colored_points, grey, Colour.BLUE, edgeThreshold))
+
+        // liste chaque voisin :
+        ArrayList<ColoredPoint> voisins = Utils.neighbors(colored_points, grey, edgeThreshold);
+
+        // blackBlueComponent de chaque voisin
+        blackBlueComponents = (HashSet<BlackBlueComponent>) voisins
                 .stream()
-                .map(e->Utils.blackBlueComponent(colored_points, e, edgeThreshold))
-                .collect(Collectors.toSet()));
+                .map(e->Utils.bBC(colored_points, e, edgeThreshold))
+                .collect(Collectors.toSet());
 
-        long nombreBlackNodes = blackBlueComponents
-                  .stream()
-                  .filter(e->e.blackNodes().size()>0)
-                  .map(e->e.blackNodes())
-                  .flatMap(e->e.stream())
-                  .distinct()
-                  .count();
-
-        // à vérifier
-        if(nombreBlackNodes>=i && blackBlueComponents.size()>=i){
+        cpt++;
+        if(blackBlueComponents.size()>=i){
           grey.setColor(Colour.BLUE);
+          greyNodes.remove(grey);
+          cpt=0;
         }
       }
     }

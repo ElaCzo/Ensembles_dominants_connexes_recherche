@@ -16,10 +16,18 @@ public class Utils {
         points.stream().filter(e-> toMark.contains(e)).forEach(e->{e.setColor(c);});
     }
 
+    protected static ArrayList<ColoredPoint> greyNodes(ArrayList<ColoredPoint> points){
+        ArrayList<ColoredPoint> result = (ArrayList<ColoredPoint>) points
+                .stream()
+                .filter(e -> e.getColor()==Colour.GREY)
+                .collect(Collectors.toList());
+        return result;
+    }
+
     protected static ColoredPoint greyNode(ArrayList<ColoredPoint> points){
         ArrayList<ColoredPoint> result = (ArrayList<ColoredPoint>) points
                 .stream()
-                .filter(e -> e.getColor()==Colour.BLACK)
+                .filter(e -> e.getColor()==Colour.GREY)
                 .collect(Collectors.toList());
         if(result.size()==0)
             return null;
@@ -40,42 +48,61 @@ public class Utils {
     }
 
     private static ArrayList<ColoredPoint> cloud
-            (ArrayList<ColoredPoint> points, ColoredPoint p, HashSet<ColoredPoint> result, Colour c,
-             int edgeThreshold){
+            (ArrayList<ColoredPoint> points, ColoredPoint p, HashSet<ColoredPoint> result,              int edgeThreshold){
         return (ArrayList<ColoredPoint>) points.stream()
-                .filter(e->!result.contains(e) && e.getColor()==c && p.distance(e)<edgeThreshold)
+                .filter(e->!result.contains(e)
+                        && e.getColor()==Colour.BLACK
+                        && p.distance(e)<edgeThreshold)
                 .collect(Collectors.toList());
     }
 
-    /* points de la même couleur c pour lesquels il existe
+    /* points de la même couleur BLACKBLUE pour lesquels il existe
     un chemin dans cet ensemble qui mène au point en paramètre. */
-    protected static ArrayList<ColoredPoint> cloud
-    (ArrayList<ColoredPoint> points, ColoredPoint p, Colour c, int edgeThreshold){
+    /* On ignore les connexions BLUE-BLUE. */
+    protected static BlackBlueComponent bBC
+    (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
         HashSet<ColoredPoint> result = new HashSet<>();
-        HashSet<ColoredPoint> tmp = new HashSet<>();;
+        HashSet<ColoredPoint> tmp = new HashSet<>();
 
-        tmp.addAll(neighbors(points, p, c, edgeThreshold));
+        if(p.getColor()==Colour.BLACK)
+            tmp.addAll(neighbors(points, p, Colour.BLUE, edgeThreshold));
+
+        tmp.addAll(neighbors(points, p, Colour.BLACK, edgeThreshold));
+
         do {
             result.addAll(tmp);
-            tmp.addAll(points
+
+            HashSet<ColoredPoint> voisinsNoirs = (HashSet<ColoredPoint>) tmp
                     .stream()
-                    .map(e->cloud(points, e, result, c, edgeThreshold))
+                    .map(e->neighbors(points, e, Colour.BLACK, edgeThreshold))
                     .flatMap(e->e.stream())
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toSet());
+
+            HashSet<ColoredPoint> voisinsBleus = (HashSet<ColoredPoint>) tmp
+                    .stream()
+                    .filter(e->e.getColor()==Colour.BLACK) // que les noirs qui peuvent avoir des voisins bleus
+                    .map(e->neighbors(points, e, Colour.BLUE, edgeThreshold))
+                    .flatMap(e->e.stream())
+                    .collect(Collectors.toSet());
+
+            tmp.addAll(voisinsBleus);
+            tmp.addAll(voisinsNoirs);
+
         }while(!tmp.equals(result));
 
 
-        ArrayList<ColoredPoint> r = new ArrayList();
-        r.addAll(result);
-        return r;
+        BlackBlueComponent b = new BlackBlueComponent();
+        b.blackBlueComponent.addAll(result);
+        return b;
     }
-
+/*
     protected static BlackBlueComponent blackBlueComponent
             (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
         ArrayList<ColoredPoint> blueNeighbors = neighbors(points, p, Colour.BLUE, edgeThreshold);
         HashSet<ColoredPoint> blackCloud = new HashSet<>(); blackCloud.add(p);
         blackCloud.addAll(cloud(points, p, Colour.BLACK, edgeThreshold));
 
+        System.out.println("BlackCloud : "+blackCloud+"\n\n");
         BlackBlueComponent blackBlueComponent = new BlackBlueComponent();
         blackBlueComponent.blackBlueComponent.addAll(blueNeighbors);
         blackBlueComponent.blackBlueComponent.addAll(blackCloud);
@@ -86,7 +113,7 @@ public class Utils {
                 .collect(Collectors.toList()));
 
         return blackBlueComponent;
-    }
+    }*/
 
     /*protected static boolean equalsBlackBlueComponent
             (ArrayList<ColoredPoint> bbc1, ArrayList<ColoredPoint> bbc2){
