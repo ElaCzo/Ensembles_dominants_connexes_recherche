@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class DefaultTeam {
 
     // Algorithme MIS qui garantit 2 hops :
-    public static ArrayList<Point> MIS2
+    public static ArrayList<Point> MIS
     (ArrayList<Point> points, int edgeThreshold) {
         ArrayList<ColoredPoint> uncoloredNodes = Utils.toColoredPoint(points);
         ArrayList<ColoredPoint> MIS = new ArrayList<>();
@@ -63,7 +63,7 @@ public class DefaultTeam {
 
     public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
         BlackBlueComponent.liste= new HashMap<>();
-        ArrayList<Point> mis = MIS2(points, edgeThreshold);
+        ArrayList<Point> mis = MIS(points, edgeThreshold);
 
         ArrayList<ColoredPoint> colored_points = Utils.toColoredPoint(points);
         Utils.mark(colored_points, (ArrayList)colored_points, Colour.GREY);
@@ -75,8 +75,6 @@ public class DefaultTeam {
         for(int i=5; i>1; i--){
             int cpt=0;
             while(!greyNodes.isEmpty() && cpt<greyNodes.size()){
-                //System.out.println(i);
-
                 grey=greyNodes.get(cpt);
 
                 HashSet<BlackBlueComponent> blackBlueComponents = new HashSet<>();
@@ -87,7 +85,7 @@ public class DefaultTeam {
                 // blackBlueComponent de chaque voisin
                 blackBlueComponents = (HashSet<BlackBlueComponent>) voisins
                         .stream()
-                        .map(e->Utils.bBC(colored_points, e, edgeThreshold))
+                        .map(e->BlackBlueComponent.BBC(colored_points, e, edgeThreshold))
                         .collect(Collectors.toSet());
 
                 cpt++;
