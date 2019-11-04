@@ -23,17 +23,6 @@ public class Utils {
         return result;
     }
 
-    protected static ColoredPoint greyNode(ArrayList<ColoredPoint> points){
-        ArrayList<ColoredPoint> result = (ArrayList<ColoredPoint>) points
-                .stream()
-                .filter(e -> e.getColor()==Colour.GREY)
-                .collect(Collectors.toList());
-        if(result.size()==0)
-            return null;
-        else
-            return result.get(0);
-    }
-
     protected static ArrayList<ColoredPoint> neighbors
             (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
         return (ArrayList<ColoredPoint>)points.stream()
@@ -44,14 +33,5 @@ public class Utils {
     protected static ArrayList<ColoredPoint> neighbors
             (ArrayList<ColoredPoint> points, ColoredPoint p, Colour c, int edgeThreshold){
         return (ArrayList<ColoredPoint>) neighbors(points, p, edgeThreshold).stream().filter(e->e.getColor()==c).collect(Collectors.toList());
-    }
-
-    private static ArrayList<ColoredPoint> cloud
-            (ArrayList<ColoredPoint> points, ColoredPoint p, HashSet<ColoredPoint> result,              int edgeThreshold){
-        return (ArrayList<ColoredPoint>) points.stream()
-                .filter(e->!result.contains(e)
-                        && e.getColor()==Colour.BLACK
-                        && p.distance(e)<edgeThreshold)
-                .collect(Collectors.toList());
     }
 }

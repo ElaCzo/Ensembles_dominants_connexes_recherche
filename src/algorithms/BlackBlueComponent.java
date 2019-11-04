@@ -32,7 +32,6 @@ public class BlackBlueComponent {
         result2.addAll(Utils.neighbors(points, p, Colour.BLACK, edgeThreshold));
 
         do {
-
             ajouts.addAll(result2);
             ajouts.removeAll(result1);
 
