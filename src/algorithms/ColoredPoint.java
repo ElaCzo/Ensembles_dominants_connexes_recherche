@@ -7,7 +7,7 @@ public class ColoredPoint extends Point {
 
     public ColoredPoint(Point p){
         super(p);
-        color = Colour.BLACK;
+        color = Colour.NOCOLOUR;
     }
 
     public Colour getColor() {
@@ -20,8 +20,8 @@ public class ColoredPoint extends Point {
 
     @Override
     public boolean equals(Object o){
-        if(o instanceof Point)
-        return super.equals((Point)o);
+        if(o instanceof ColoredPoint || o instanceof Point)
+        return ((Point)o).x==this.x && ((Point)o).y==this.y;
         return false;
     }
 

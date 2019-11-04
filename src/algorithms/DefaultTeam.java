@@ -11,10 +11,56 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class DefaultTeam {
+
+    // ajouter les points seuls aussi.
+  public static ArrayList<Point> MIS2
+          (ArrayList<Point> points, int edgeThreshold) {
+    ArrayList<ColoredPoint> uncoloredNodes = Utils.toColoredPoint(points);
+    ArrayList<ColoredPoint> MIS = new ArrayList<>();
+    ArrayList<ColoredPoint> candidat = new ArrayList<>();
+
+    Collections.shuffle(uncoloredNodes);
+    candidat.add(uncoloredNodes.get(0));
+
+    while(!candidat.isEmpty()){
+      ColoredPoint random =candidat.remove(0);
+      if(random.getColor()==Colour.GREY)
+        continue ;
+
+      random.setColor(Colour.BLACK);
+      MIS.add(random);
+
+      for(ColoredPoint pt: uncoloredNodes){ // set all random neighour in gray
+        if (pt.distance(random)< edgeThreshold)
+          pt.setColor(Colour.GREY);
+      }
+
+      for(ColoredPoint pt : uncoloredNodes){
+        if (pt.distance(random)< edgeThreshold){
+          for(ColoredPoint ptv : uncoloredNodes){
+            if(ptv.distance(pt)< edgeThreshold && ptv.getColor()==Colour.NOCOLOUR && !candidat.contains(ptv)){
+              candidat.add(ptv);
+            }
+          }
+        }
+      }
+    }
+
+    MIS.stream().forEach(e->e.setColor(Colour.BLACK));
+
+    // On ajoute les nodes isolées
+    MIS.addAll(uncoloredNodes
+            .stream()
+            .filter(e->Utils.neighbors(uncoloredNodes, e, edgeThreshold).size()==1)
+            .collect(Collectors.toList()));
+
+    return (ArrayList<Point>) MIS.stream().map(e->(Point)e).collect(Collectors.toList());
+  }
 
   // sequential algorithm
   private ArrayList<Point> MIS(ArrayList<Point> points, int edgeThreshold){
@@ -34,25 +80,26 @@ public class DefaultTeam {
   }
 
   public ArrayList<Point> calculConnectedDominatingSet(ArrayList<Point> points, int edgeThreshold) {
-    ArrayList<Point> mis = MIS(points, edgeThreshold);
+    ArrayList<Point> mis = MIS2(points, edgeThreshold);
+
     ArrayList<ColoredPoint> colored_points = Utils.toColoredPoint(points);
     Utils.mark(colored_points, (ArrayList)colored_points, Colour.GREY);
     Utils.mark(colored_points, mis, Colour.BLACK);
 
     ColoredPoint grey;
-    ArrayList<ColoredPoint> greyNodes;
-    for(int i=5; i>1; i--){
-      ArrayList<ColoredPoint> neighbors = new ArrayList<>();
+    ArrayList<ColoredPoint> greyNodes=Utils.greyNodes(colored_points);
 
-      greyNodes=Utils.greyNodes(colored_points);
+    for(int i=5; i>1; i--){
       int cpt=0;
       while(!greyNodes.isEmpty() && cpt<greyNodes.size()){
+        //System.out.println(i);
+
         grey=greyNodes.get(cpt);
 
         HashSet<BlackBlueComponent> blackBlueComponents = new HashSet<>();
 
-        // liste chaque voisin :
-        ArrayList<ColoredPoint> voisins = Utils.neighbors(colored_points, grey, edgeThreshold);
+        // liste chaque voisin noir :
+        ArrayList<ColoredPoint> voisins = Utils.neighbors(colored_points, grey, Colour.BLACK, edgeThreshold);
 
         // blackBlueComponent de chaque voisin
         blackBlueComponents = (HashSet<BlackBlueComponent>) voisins
@@ -62,6 +109,7 @@ public class DefaultTeam {
 
         cpt++;
         if(blackBlueComponents.size()>=i){
+          System.out.println(blackBlueComponents.size());
           grey.setColor(Colour.BLUE);
           greyNodes.remove(grey);
           cpt=0;
@@ -72,7 +120,7 @@ public class DefaultTeam {
     ArrayList<Point> result = new ArrayList<>();
     result.addAll(colored_points
             .stream()
-            .filter(e->e.getColor()==Colour.BLUE)
+            .filter(e->e.getColor()==Colour.BLUE || e.getColor()==Colour.BLACK) // ajout black
             .collect(Collectors.toList()));
 
     System.out.println(result);

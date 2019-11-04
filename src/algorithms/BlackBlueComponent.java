@@ -1,11 +1,14 @@
 package algorithms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class BlackBlueComponent {
     public HashSet<ColoredPoint> blackBlueComponent;
+
+    public static HashMap<ColoredPoint, BlackBlueComponent> liste = new HashMap<>();
 
     public BlackBlueComponent(){
         blackBlueComponent= new HashSet<>();

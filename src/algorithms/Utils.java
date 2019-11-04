@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Utils {
     protected static ArrayList<ColoredPoint> toColoredPoint(ArrayList<Point> p){
@@ -63,6 +62,10 @@ public class Utils {
     (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
         HashSet<ColoredPoint> result = new HashSet<>();
         HashSet<ColoredPoint> tmp = new HashSet<>();
+        HashSet<ColoredPoint> tmp2 = new HashSet<>();
+
+        if(BlackBlueComponent.liste.containsKey(p))
+            return BlackBlueComponent.liste.get(p);
 
         if(p.getColor()==Colour.BLACK)
             tmp.addAll(neighbors(points, p, Colour.BLUE, edgeThreshold));
@@ -70,15 +73,19 @@ public class Utils {
         tmp.addAll(neighbors(points, p, Colour.BLACK, edgeThreshold));
 
         do {
+
+            tmp2.addAll(tmp);
+            tmp2.removeAll(result);
+
             result.addAll(tmp);
 
-            HashSet<ColoredPoint> voisinsNoirs = (HashSet<ColoredPoint>) tmp
+            HashSet<ColoredPoint> voisinsNoirs = (HashSet<ColoredPoint>) tmp2
                     .stream()
                     .map(e->neighbors(points, e, Colour.BLACK, edgeThreshold))
                     .flatMap(e->e.stream())
                     .collect(Collectors.toSet());
 
-            HashSet<ColoredPoint> voisinsBleus = (HashSet<ColoredPoint>) tmp
+            HashSet<ColoredPoint> voisinsBleus = (HashSet<ColoredPoint>) tmp2
                     .stream()
                     .filter(e->e.getColor()==Colour.BLACK) // que les noirs qui peuvent avoir des voisins bleus
                     .map(e->neighbors(points, e, Colour.BLUE, edgeThreshold))
@@ -93,30 +100,10 @@ public class Utils {
 
         BlackBlueComponent b = new BlackBlueComponent();
         b.blackBlueComponent.addAll(result);
+        b.blackBlueComponent.stream().forEach(e->
+        {if(!BlackBlueComponent.liste.containsKey(e))
+            BlackBlueComponent.liste.put(e, b);});
+
         return b;
     }
-/*
-    protected static BlackBlueComponent blackBlueComponent
-            (ArrayList<ColoredPoint> points, ColoredPoint p, int edgeThreshold){
-        ArrayList<ColoredPoint> blueNeighbors = neighbors(points, p, Colour.BLUE, edgeThreshold);
-        HashSet<ColoredPoint> blackCloud = new HashSet<>(); blackCloud.add(p);
-        blackCloud.addAll(cloud(points, p, Colour.BLACK, edgeThreshold));
-
-        System.out.println("BlackCloud : "+blackCloud+"\n\n");
-        BlackBlueComponent blackBlueComponent = new BlackBlueComponent();
-        blackBlueComponent.blackBlueComponent.addAll(blueNeighbors);
-        blackBlueComponent.blackBlueComponent.addAll(blackCloud);
-
-        blackBlueComponent.blackBlueComponent.addAll(blackCloud.stream()
-                .map(e->neighbors(points, p, Colour.BLUE, edgeThreshold))
-                .flatMap(e->e.stream())
-                .collect(Collectors.toList()));
-
-        return blackBlueComponent;
-    }*/
-
-    /*protected static boolean equalsBlackBlueComponent
-            (ArrayList<ColoredPoint> bbc1, ArrayList<ColoredPoint> bbc2){
-        return bbc1.stream().filter(e->e.getColor()==Colour.BLUE).anyMatch(bbc2::contains);
-    }*/
 }
